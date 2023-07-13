@@ -7,11 +7,10 @@ from googleapiclient.discovery import build
 class Channel:
     """Класс для ютуб-канала"""
     api_key: str = os.getenv('API_KEY_YouTube')
-    youtube = build('youtube', 'v3', developerKey=api_key)
 
     def __init__(self, channel_id: str):
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.__channel = self.youtube.channels().list(id=channel_id, part='snippet,statistics,contentDetails').execute()
+        self.__channel = self.get_service().channels().list(id=channel_id, part='snippet,statistics,contentDetails').execute()
         self.title: str = self.__channel['items'][0]['snippet']['title']  # название канала
         self.description: str = self.__channel['items'][0]['snippet']['description']  # описание канала
         self.url = f'https://www.youtube.com/channel/{channel_id}'  # ссылка на канал
@@ -36,14 +35,13 @@ class Channel:
         """
         Кл-метод, возвращающий объект для работы с YouTube API
         """
-        return cls.youtube
+        return build('youtube', 'v3', developerKey=cls.api_key)
 
     def to_json(self, file_name):
         """
         Сохраняет в файл значения атрибутов экземпляра Channel
         """
         result = {
-            '__channel': self.__channel,
             'title': self.title,
             'description': self.description,
             'url': self.url,
