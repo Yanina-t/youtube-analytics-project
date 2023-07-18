@@ -9,8 +9,11 @@ class Channel:
     api_key: str = os.getenv('API_KEY_YouTube')
 
     def __init__(self, channel_id: str):
-        """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.__channel = self.get_service().channels().list(id=channel_id, part='snippet,statistics,contentDetails').execute()
+        """
+        Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API.
+        """
+        self.__channel = self.get_service().channels().list(id=channel_id,
+                                                            part='snippet,statistics,contentDetails').execute()
         self.title: str = self.__channel['items'][0]['snippet']['title']  # название канала
         self.description: str = self.__channel['items'][0]['snippet']['description']  # описание канала
         self.url = f'https://www.youtube.com/channel/{channel_id}'  # ссылка на канал
@@ -19,16 +22,20 @@ class Channel:
         self.view_count: str = self.__channel['items'][0]['statistics']['viewCount']  # общее количество просмотров
 
     def __str__(self):
-        return f'{self.title} ({self.url})'
+        return f"{self.title}" #return f"'{self.title} ({self.url})'"
 
     def __add__(self, other):
         return int(self.subscriber_count) + int(other.subscriber_count)
+
     def __sub__(self, other):
         return int(self.subscriber_count) - int(other.subscriber_count)
+
     def __gt__(self, other):
         return int(self.subscriber_count) > int(other.subscriber_count)
+
     def __ge__(self, other):
         return int(self.subscriber_count) >= int(other.subscriber_count)
+
     def __lt__(self, other):
         return int(self.subscriber_count) < int(other.subscriber_count)
 
