@@ -22,7 +22,7 @@ class Channel:
         self.view_count: str = self.__channel['items'][0]['statistics']['viewCount']  # общее количество просмотров
 
     def __str__(self):
-        return f"{self.title}" #return f"'{self.title} ({self.url})'"
+        return f"'{self.title} ({self.url})'"
 
     def __add__(self, other):
         return int(self.subscriber_count) + int(other.subscriber_count)
