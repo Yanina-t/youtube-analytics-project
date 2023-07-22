@@ -1,10 +1,10 @@
 import json
 import os
 
-from googleapiclient.discovery import build
+from src.YTMixin import YTMixin
 
 
-class Channel:
+class Channel(YTMixin):
     """Класс для ютуб-канала"""
     api_key: str = os.getenv('API_KEY_YouTube')
 
@@ -53,13 +53,6 @@ class Channel:
     @channel_id.setter
     def channel_id(self, __channel):
         print("AttributeError: property 'channel_id' of 'Channel' object has no setter")
-
-    @classmethod
-    def get_service(cls):
-        """
-        Кл-метод, возвращающий объект для работы с YouTube API
-        """
-        return build('youtube', 'v3', developerKey=cls.api_key)
 
     def to_json(self, file_name):
         """

@@ -1,23 +1,21 @@
+import isodate
 from datetime import timedelta
 from operator import itemgetter
-
-import isodate
-
-from src.API_KEY_YT import youtube
+from src.YTMixin import YTMixin
 
 
-class PlayList:
+class PlayList(YTMixin):
     def __init__(self, playlist_id: str):
         """
         Экземпляр инициализируется id канала и имеет публичные атрибуты.
         """
         self.playlist_id = playlist_id
-        self.playlist = youtube.playlists().list(part="snippet,contentDetails",
+        self.playlist = self.get_service().playlists().list(part="snippet,contentDetails",
                                                  id=playlist_id,
                                                  maxResults=50, ).execute()
         self.title: str = self.playlist['items'][0]['snippet']['title']  # название плейлиста
         self.url = f'https://www.youtube.com/playlist?list={playlist_id}'  # ссылка на плейлист
-        self.playlist_videos = youtube.playlistItems().list(playlistId=playlist_id,
+        self.playlist_videos = self.get_service().playlistItems().list(playlistId=playlist_id,
                                                             part='contentDetails',
                                                             maxResults=50, ).execute()
 
@@ -34,7 +32,7 @@ class PlayList:
         """
         Вывести длительности видеороликов из плейлиста, хранит всю инф о плейлистах
         """
-        video_response = youtube.videos().list(part='contentDetails,statistics',
+        video_response = self.get_service().videos().list(part='contentDetails,statistics',
                                                id=','.join(self.video_ids)).execute()
         return video_response
 
