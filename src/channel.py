@@ -1,7 +1,7 @@
 import json
 import os
 
-from src.YTMixin import YTMixin
+from src.yt_mixin import YTMixin
 
 
 class Channel(YTMixin):

@@ -1,40 +1,31 @@
 import isodate
 from datetime import timedelta
 from operator import itemgetter
-from src.YTMixin import YTMixin
+from src.yt_mixin import YTMixin
 
 
 class PlayList(YTMixin):
+    """Класс для работы в плейлистами ютуб."""
+
     def __init__(self, playlist_id: str):
         """
         Экземпляр инициализируется id канала и имеет публичные атрибуты.
         """
-        self.playlist_id = playlist_id
+        self.__playlist_id = playlist_id
         self.playlist = self.get_service().playlists().list(part="snippet,contentDetails",
-                                                 id=playlist_id,
-                                                 maxResults=50, ).execute()
+                                                            id=playlist_id,
+                                                            maxResults=50, ).execute()
         self.title: str = self.playlist['items'][0]['snippet']['title']  # название плейлиста
         self.url = f'https://www.youtube.com/playlist?list={playlist_id}'  # ссылка на плейлист
         self.playlist_videos = self.get_service().playlistItems().list(playlistId=playlist_id,
-                                                            part='contentDetails',
-                                                            maxResults=50, ).execute()
-
-    @property
-    def video_ids(self):
-        """
-        Получить все id видеороликов из плейлиста
-        """
-        video_ids: list[str] = [video['contentDetails']['videoId'] for video in self.playlist_videos['items']]
-        return video_ids
-
-    @property
-    def video_response(self):
-        """
-        Вывести длительности видеороликов из плейлиста, хранит всю инф о плейлистах
-        """
-        video_response = self.get_service().videos().list(part='contentDetails,statistics',
-                                               id=','.join(self.video_ids)).execute()
-        return video_response
+                                                                       part='contentDetails',
+                                                                       maxResults=50, ).execute()
+        self.video_ids: list[str] = [video['contentDetails']['videoId'] for video in
+                                     self.playlist_videos['items']]  # Получить все id видеороликов из плейлиста
+        self.video_response = self.get_service().videos().list(part='contentDetails,statistics',
+                                                               id=','.join(
+                                                                   self.video_ids)).execute()  # Вывести длительности
+        # видеороликов из плейлиста, хранит всю инф о плейлистах
 
     def video_duration(self):
         """
@@ -64,10 +55,9 @@ class PlayList(YTMixin):
         total_seconds = sum(self.video_duration(), timedelta())
         return total_seconds.seconds
 
-    @property
-    def list_for_best_video(self):
+    def show_best_video(self):
         """
-        Возвращает список видео из плейлиста (по количеству лайков, id, url)
+        Возвращает ссылку на самое популярное видео из плейлиста (по количеству лайков)
         """
         link_list = []
         for video in self.video_response['items']:
@@ -80,11 +70,5 @@ class PlayList(YTMixin):
                     'url': yt_link
                 }
             )
-        return link_list
-
-    def show_best_video(self):
-        """
-        Возвращает ссылку на самое популярное видео из плейлиста (по количеству лайков)
-        """
-        url_sort = sorted(self.list_for_best_video, key=itemgetter('likeCount'), reverse=True)
+        url_sort = sorted(link_list, key=itemgetter('likeCount'), reverse=True)
         return url_sort[0]['url']

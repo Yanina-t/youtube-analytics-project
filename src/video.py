@@ -1,5 +1,4 @@
-from src.YTMixin import YTMixin
-from src.channel import Channel
+from src.yt_mixin import YTMixin
 
 
 class Video(YTMixin):
@@ -20,6 +19,4 @@ class Video(YTMixin):
 class PLVideo(Video):
     def __init__(self, video_id: str, play_list_id: str):
         super().__init__(video_id)
-        self.play_list = self.get_service().playlistItems().list(part="snippet,contentDetails", maxResults=25,
-                                                                 playlistId=play_list_id, videoId=video_id).execute()
-
+        self.play_list = play_list_id
